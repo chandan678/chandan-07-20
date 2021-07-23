@@ -2,14 +2,21 @@ version: "3.9"
 
 services:
   db:
+    restart: always
     image: postgres
+    container_name: db
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - default
   web:
+    restart: always
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
@@ -18,3 +25,10 @@ services:
       - "8000:8000"
     depends_on:
       - db
+    links:
+      - db:db
+    networks:
+      - default
+networks:
+  default:
+    driver: bridge
